@@ -1,0 +1,108 @@
+esphome:
+  name: doorbell
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Doorbell Fallback Hotspot"
+    password: "57ZDT3EJmzWO"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: allemaal
+
+ota:
+  password: allemaal
+
+text_sensor:
+  - platform: version
+    name: Doorbell ESPHome Version
+  
+  - platform: homeassistant
+    name: "Doorbell Ring time (ms)"
+    entity_id: input_number.doorbell_ring_time
+    id: doorbell_ring_time_ms
+    internal: true
+
+sensor:
+  - platform: uptime
+    name: Doorbell uptime
+
+  - platform: wifi_signal
+    name: Doorbell WiFi Signal
+    update_interval: 60s
+
+globals:
+  - id: ringer
+    type: bool
+    restore_value: true
+    initial_value: 'true'
+
+switch:
+  - platform: restart
+    name: Doorbell Restart
+  
+  #needed to mute ringer
+  - platform: template
+    name: "Doorbell Ringer On"
+    id: ringer_on
+    restore_state: false
+    turn_on_action:
+      - globals.set:
+          id: ringer
+          value: 'true'
+    turn_off_action:
+      - globals.set:
+          id: ringer
+          value: 'false'
+    lambda: |-
+      return id(ringer);
+
+  # Ringer bell connected to D0 / gpio16
+  - platform: gpio
+    pin: D0
+    name: "Doorbell Bell"
+    id: doorbell_bell
+    restore_mode: ALWAYS_OFF
+
+binary_sensor:
+  # Doorbell Button at frontdoor on D3
+  - platform: gpio
+    name: "Doorbell Button"
+    pin:
+      number: D3
+      inverted: true
+    id: doorbell_button
+    filters:
+      - delayed_on_off: 50ms
+    on_press:
+      if:
+        condition:
+          switch.is_on: ringer_on
+        then:
+          - switch.turn_on: doorbell_bell
+            #- delay: !lambda "id(doorbell_ring_time_ms).state"
+          - delay: 1s
+          - switch.turn_off: doorbell_bell
+    on_release:
+      then:
+        - switch.turn_off: doorbell_bell
+  
+
+
+
+
+
+
+
+
