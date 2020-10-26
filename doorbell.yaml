@@ -19,10 +19,20 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: allemaal
+  password: !secret api_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
 
 ota:
-  password: allemaal
+  password: !secret ota_password
+
+globals:
+  - id: ringer
+    type: bool
+    restore_value: true
+    initial_value: 'true'
 
 text_sensor:
   - platform: version
@@ -41,12 +51,6 @@ sensor:
   - platform: wifi_signal
     name: Doorbell WiFi Signal
     update_interval: 60s
-
-globals:
-  - id: ringer
-    type: bool
-    restore_value: true
-    initial_value: 'true'
 
 switch:
   - platform: restart
@@ -72,7 +76,7 @@ switch:
   - platform: gpio
     pin: D0
     name: "Doorbell Bell"
-    id: doorbell_bell
+    id: bell
     restore_mode: ALWAYS_OFF
 
 binary_sensor:
@@ -82,27 +86,19 @@ binary_sensor:
     pin:
       number: D3
       inverted: true
-    id: doorbell_button
+    id: button
     filters:
-      - delayed_on_off: 50ms
+      - delayed_on_off: 25ms
     on_press:
       if:
         condition:
           switch.is_on: ringer_on
         then:
-          - switch.turn_on: doorbell_bell
+          - switch.turn_on: bell
             #- delay: !lambda "id(doorbell_ring_time_ms).state"
-          - delay: 1s
-          - switch.turn_off: doorbell_bell
+          - delay: 1s #hold not allowed
+          - switch.turn_off: bell
     on_release:
       then:
-        - switch.turn_off: doorbell_bell
+        - switch.turn_off: bell
   
-
-
-
-
-
-
-
-
