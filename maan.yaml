@@ -1,0 +1,85 @@
+esphome:
+  name: maan
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Maan Fallback Hotspot"
+    password: "T7lEfcFDTGsn"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+ota:
+  password: !secret ota_password
+
+globals:
+   - id: brightness_value
+     type: float
+     restore_value: no
+     initial_value: '1.0'
+
+sensor:
+  - platform: uptime
+    name: Maan uptime
+
+  - platform: wifi_signal
+    name: Maan WiFi Signal
+    update_interval: 60s
+
+switch:
+  - platform: restart
+    name: Maan Restart
+
+output:
+  - platform: esp8266_pwm
+    id: pwm_output
+    pin: D1
+
+light:
+  - platform: monochromatic
+    name: "Maan"
+    output: pwm_output
+    id: lamp
+
+binary_sensor:
+  - platform: gpio
+    name: "Maan Button"
+    pin:
+      number: D2
+      mode: INPUT_PULLUP
+      inverted: true
+    id: button
+    filters:
+      - delayed_on_off: 25ms
+    on_press:
+      then:
+        - light.toggle: lamp
+    on_double_click:
+      min_length: 50ms
+      max_length: 350ms
+      then: 
+        - light.turn_on:
+            id: lamp
+            brightness: !lambda |-
+              id(brightness_value) = id(brightness_value) + 0.2;
+              if (id(brightness_value) > 1.0){ 
+                id(brightness_value) = 0.0; 
+              }
+              return id(brightness_value);
+        

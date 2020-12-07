@@ -95,8 +95,8 @@ binary_sensor:
           switch.is_on: ringer_on
         then:
           - switch.turn_on: bell
-            #- delay: !lambda "id(doorbell_ring_time_ms).state"
-          - delay: 1s #hold not allowed
+          - lambda: !lambda |-
+              delay( atoi( id(doorbell_ring_time_ms).state.c_str() ));
           - switch.turn_off: bell
     on_release:
       then:
