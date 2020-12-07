@@ -8,8 +8,5 @@
 **/src/
 **/platformio.ini
 /secrets.yaml
-<<<<<<< HEAD
 /penv
-=======
->>>>>>> a6013895de3b75bb0bc50ccd227211d525eb56d5
 /*.ttf
