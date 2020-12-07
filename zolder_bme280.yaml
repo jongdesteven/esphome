@@ -82,11 +82,15 @@ sensor:
     update_interval: 60s
   - platform: adc
     pin: VCC
+<<<<<<< HEAD
     name: "Zolder BME280 VCC Voltage"
     filters:
       - calibrate_linear:
           - 3.41 -> 3.84
           - 3.02 -> 3.33
+=======
+    name: "VCC Voltage"
+>>>>>>> a6013895de3b75bb0bc50ccd227211d525eb56d5
 
 switch:
   - platform: restart
