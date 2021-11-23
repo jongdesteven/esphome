@@ -1,0 +1,60 @@
+esphome:
+  name: tuinverlichting
+  platform: ESP8266
+  board: esp8285
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "tuinverlichting Fallback"
+    password: "57ZDT3EJmzWO"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+ota:
+  password: !secret ota_password
+
+# Enable Web server
+web_server:
+  port: 80
+
+sensor:
+  - platform: wifi_signal
+    name: Tuinverlichting WiFi Signal
+    update_interval: 60s
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Tuinverlichting button"
+    on_press:
+      - switch.toggle: relay
+
+switch:
+  - platform: gpio
+    name: Tuinverlichting Switch
+    pin: GPIO12
+    id: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes
+

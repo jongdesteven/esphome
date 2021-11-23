@@ -1,0 +1,113 @@
+esphome:
+  name: werkplaats_tool
+  platform: ESP8266
+  board: esp8285
+  
+#Based on Tuya plug
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Werkpl tool Fallback"
+    password: "57ZDT3EJmzWO"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+ota:
+  password: !secret ota_password
+
+sensor:
+  - platform: uptime
+    name: "Werkplaats tool uptime"
+
+  - platform: wifi_signal
+    name: Werkplaats tool WiFi Signal
+    update_interval: 60s
+
+  - platform: hlw8012
+    update_interval: 200ms
+    sel_pin:
+      number: GPIO05
+      inverted: false
+    cf_pin: GPIO14
+    cf1_pin: GPIO13
+    initial_mode: CURRENT
+    change_mode_every: 4294967295
+    # Current sensor
+    current:
+      name: Werkplaats tool current
+      unit_of_measurement: A
+      accuracy_decimals: 3
+      internal: yes
+    # Voltage sensor
+    voltage:
+      name: Werkplaats tool voltage
+      unit_of_measurement: V
+      accuracy_decimals: 1
+      internal: yes
+    # Power sensor
+    power:
+      id: power
+      name: Werkplaats tool power
+      unit_of_measurement: W
+      internal: yes
+  
+  - platform: homeassistant
+    name: Werkplaats tool trigger level
+    entity_id: input_number.werkplaats_tool_trigger
+    id: trigger
+    internal: yes
+
+switch:
+  - platform: restart
+    name: Werkplaats tool Restart
+  
+  - platform: gpio
+    pin: GPIO12
+    name: "Werkplaats tool"
+    id: relay
+    restore_mode: ALWAYS_OFF
+
+binary_sensor:
+  - platform: gpio
+    name: "Werkplaats Tool Button"
+    pin:
+      number: GPIO0
+    id: button
+    filters:
+      - delayed_on_off: 25ms
+    on_press:
+      then:
+        - switch.toggle: relay
+        
+  - platform: template
+    name: "Tool Power Status"
+    lambda: |-
+      if( id(power).state >= id(trigger).state) {
+        // Tool turned on
+        return true;
+      }
+      else {
+        // Tool Turned Off
+        return false;
+      }
+
+status_led:
+  pin:
+    number: GPIO15
+    inverted: true
+

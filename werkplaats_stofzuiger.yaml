@@ -1,0 +1,69 @@
+esphome:
+  name: werkplaats_stofzuiger
+  platform: ESP8266
+  board: esp8285
+  arduino_version: 2.4.2
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Werkpl stofz Fallback"
+    password: "57ZDT3EJmzWO"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+ota:
+  password: !secret ota_password
+
+sensor:
+  - platform: uptime
+    name: "werkplaats-afzuiging uptime"
+
+  - platform: wifi_signal
+    name: Werkplaats Afzuiging WiFi Signal
+    update_interval: 60s
+
+switch:
+  - platform: restart
+    name: Werkplaats tool Restart
+  
+  - platform: gpio
+    pin: GPIO12
+    name: "Werkplaats Afzuiging"
+    id: relay
+    restore_mode: ALWAYS_OFF
+
+binary_sensor:
+  - platform: gpio
+    name: "Werkplaats Afzuiging Button"
+    pin:
+      number: GPIO4
+      inverted: yes
+    id: button
+    filters:
+      - delayed_on_off: 25ms
+    on_press:
+      then:
+        - switch.turn_on: relay
+    on_release:
+      then:
+        - switch.turn_off: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: true

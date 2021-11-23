@@ -1,0 +1,55 @@
+esphome:
+  name: voordeurlamp
+  platform: ESP8266
+  board: esp8285
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+  domain: .lan
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "voordeurlamp Fallback Hotspot"
+    password: "57ZDT3EJmzWO"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+ota:
+  password: !secret ota_password
+
+sensor:
+# - platform: uptime
+#  name: voordeurlamp uptime
+
+  - platform: wifi_signal
+    name: voordeurlamp WiFi Signal
+    update_interval: 60s
+
+switch:
+  - platform: restart
+    name: Voordeurlamp Restart
+
+light:
+  - platform: binary
+    id: lamp
+    name: "Voordeur Lamp"
+    output: relay
+
+output:
+  - platform: gpio
+    pin: GPIO12
+    id: relay
+
+  

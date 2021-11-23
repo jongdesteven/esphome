@@ -1,0 +1,72 @@
+esphome:
+  name: spiegel_verwarming
+  platform: ESP8266
+  board: esp8285
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "spiegelver Fallback Hotspot"
+    password: "57ZDT3EJmzWO"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+ota:
+  password: !secret ota_password
+
+sensor:
+  - platform: uptime
+    name: "spiegelverwarming uptime"
+
+  - platform: wifi_signal
+    name: Spiegelverwarming WiFi Signal
+    update_interval: 60s
+
+switch:
+  - platform: restart
+    name: Spiegelverwarming Restart
+  
+  - platform: gpio
+    pin: GPIO12
+    name: "Spiegelverwarming"
+    id: relay
+    restore_mode: ALWAYS_OFF
+
+binary_sensor:
+  - platform: gpio
+    name: "Spiegelverwarming Schakelaar"
+    pin:
+      number: GPIO4
+    id: button
+    filters:
+      - delayed_on_off: 25ms
+    on_double_click:
+      - script.execute: script_spiegelverwarming_aan
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: true
+
+script:
+  - id: script_spiegelverwarming_aan
+    mode: restart
+    then:
+      - switch.turn_on: relay
+      - delay: 20 min
+      - switch.turn_off: relay
+  

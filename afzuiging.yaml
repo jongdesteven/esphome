@@ -1,0 +1,84 @@
+esphome:
+  name: afzuiging
+  platform: ESP8266
+  board: esp8285
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "afzuiging Fallback Hotspot"
+    password: "57ZDT3EJmzWO"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+ota:
+  password: !secret ota_password
+
+sensor:
+# - platform: uptime
+#  name: "afzuiging uptime"
+
+  - platform: wifi_signal
+    name: Afzuiging WiFi Signal
+    update_interval: 60s
+
+switch:
+  - platform: restart
+    name: afzuiging Restart
+  
+  - platform: gpio
+    pin: GPIO5
+    name: "Afzuiging Mid"
+    id: relay1
+    interlock: relay2
+    restore_mode: ALWAYS_OFF
+    
+  - platform: gpio
+    pin: GPIO12
+    name: "Afzuiging High"
+    id: relay2
+    interlock: relay1
+    restore_mode: ALWAYS_OFF
+    
+  - platform: template
+    name: "Afzuiging Low"
+    lambda: !lambda |-
+      if ( id(relay1).state || id(relay2).state ){
+        return false;
+      }
+      else{
+        return true;
+      }
+    turn_on_action:
+      - switch.turn_off: relay1
+      - switch.turn_off: relay2
+
+binary_sensor:
+  - platform: gpio
+    name: "Afzuiging Button"
+    pin:
+      number: GPIO10
+    id: button
+    filters:
+      - delayed_on_off: 25ms
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: true
+
+  

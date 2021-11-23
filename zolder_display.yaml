@@ -1,5 +1,5 @@
 esphome:
-  name: bbqtemp
+  name: zolder_display
   platform: ESP8266
   board: nodemcuv2
 
@@ -9,7 +9,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "bbqtemp Fallback Hotspot"
+    ssid: "Zolder_display Fallback Hotspot"
     password: "57ZDT3EJmzWO"
 
 captive_portal:
@@ -32,9 +32,6 @@ i2c:
   sda: D2
   scl: D1
 
-spi:
-  miso_pin: D4
-  clk_pin: D6
 
 font:
   - file: "lucida_sans_unicode.ttf"
@@ -46,13 +43,10 @@ font:
   - file: "lucida_sans_unicode.ttf"
     id: font3
     size: 9
-    
-sensor:
-  - platform: uptime
-    name: BBQtemp uptime
 
+sensor:
   - platform: wifi_signal
-    name: BBQtemp WiFi Signal
+    name: Zolder Display WiFi Signal
     update_interval: 60s
 
   - platform: homeassistant
@@ -65,21 +59,22 @@ sensor:
     entity_id: sensor.zolder_temperature
     internal: true
 
-  - platform: max31855
-    name: BBQ Temp 1
-    id: sensor1
-    cs_pin: D7
-    update_interval: 5s
-
-  - platform: max31855
-    name: BBQ Temp 2
-    id: sensor2
-    cs_pin: D5
-    update_interval: 5s
+  - platform: bme280
+    temperature:
+      name: "Zolder Display temperature"
+      oversampling: 16x
+      id: zolder_temp_internal
+    pressure:
+      name: "Zolder Display pressure"
+    humidity:
+      name: "Zolder Display humidity"
+    address: 0x76
+    iir_filter: 2x
+    update_interval: 60s
 
 switch:
   - platform: restart
-    name: BBQtemp Restart
+    name: Zolder Display Restar
   
 display:
   - platform: ssd1306_i2c
@@ -87,17 +82,14 @@ display:
     address: 0x3C
     lambda: |-
       // Title
-      it.print(64,0, id(font3), TextAlign::TOP_CENTER, "Zolder");
+      //it.print(64,0, id(font3), TextAlign::TOP_CENTER, "Zolder");
       // Print time in HH:MM format
-      it.strftime(0, 25, id(font1), TextAlign::CENTER_LEFT, "%H:%M", id(homeassistant_time).now());
-      // temp
+      it.strftime(0, -10, id(font1), TextAlign::TOP_LEFT, "%H:%M", id(homeassistant_time).now());
+      // Temp
+      it.printf(127, 37, id(font2), TextAlign::BASELINE_RIGHT, "Zolder: %.1f°", id(zolder_temp_internal).state);
       if (id(zolder_temp).has_state()) {
-        it.printf(127, 50, id(font2), TextAlign::BASELINE_RIGHT, "Zolder: %.1f°", id(zolder_temp).state);
+        it.printf(127, 50, id(font2), TextAlign::BASELINE_RIGHT, "Tado: %.1f°", id(zolder_temp).state);
       }
       if (id(outside_temp).has_state()) {
         it.printf(127, 63, id(font2), TextAlign::BASELINE_RIGHT, "Buiten: %.1f°", id(outside_temp).state);
       }
-      //sensor1
-      //it.printf(127, 0, id(font2), TextAlign::TOP_RIGHT, "%.1f°", id(sensor1).state);
-      //it.printf(127, 15, id(font2), TextAlign::TOP_RIGHT, "%.1f°", id(sensor2).state);
-
