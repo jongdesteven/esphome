@@ -1,5 +1,5 @@
 esphome:
-  name: tuinverlichting
+  name: broodoven
   platform: ESP8266
   board: esp8285
 
@@ -9,8 +9,8 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Tuinverlichting Fallback"
-    password: "57ZDT3EJmzWO"
+    ssid: "Broodoven Fallback"
+    password: !secret fallback_password
 
 captive_portal:
 
@@ -34,8 +34,10 @@ web_server:
 
 sensor:
   - platform: wifi_signal
-    name: Tuinverlichting WiFi Signal
+    name: Broodoven WiFi Signal
     update_interval: 60s
+    entity_category: diagnostic
+    disabled_by_default: false
 
 # Power sensor
   - platform: hlw8012
@@ -48,7 +50,7 @@ sensor:
     update_interval: 3s
     # Current sensor
     current:
-      name: Tuinverlichting current
+      name: Broodoven current
       unit_of_measurement: A
       accuracy_decimals: 3
       filters:
@@ -65,7 +67,7 @@ sensor:
         - lambda: if (x < (0.01 - 0.013)) return 0; else return (x - 0.013);
     # Voltage sensor
     voltage:
-      name: Tuinverlichting voltage
+      name: Broodoven voltage
       unit_of_measurement: V
       accuracy_decimals: 1
       filters:
@@ -76,7 +78,7 @@ sensor:
     # Power sensor
     power:
       id: power
-      name: Tuinverlichting power
+      name: Broodoven power
       unit_of_measurement: W
       accuracy_decimals: 0
       filters:
@@ -96,11 +98,13 @@ sensor:
   
 switch:
   - platform: restart
-    name: Tuinverlichting Restart
+    name: Broodoven Restart
+    entity_category: diagnostic
+    disabled_by_default: true
   
   - platform: gpio
     pin: GPIO14
-    name: "Tuinverlichting switch"
+    name: "Broodoven Switch"
     id: relay
     restore_mode: ALWAYS_OFF
     on_turn_on:
@@ -110,7 +114,7 @@ switch:
 
 binary_sensor:
   - platform: gpio
-    name: "Tuinverlichting Button"
+    name: "Broodoven Button"
     pin:
       number: GPIO3
       inverted: true

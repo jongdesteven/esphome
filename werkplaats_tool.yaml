@@ -12,7 +12,7 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Werkpl tool Fallback"
-    password: "57ZDT3EJmzWO"
+    password: !secret fallback_password
 
 captive_portal:
 
@@ -37,6 +37,7 @@ sensor:
   - platform: wifi_signal
     name: Werkplaats tool WiFi Signal
     update_interval: 60s
+    entity_category: diagnostic
 
   - platform: hlw8012
     update_interval: 200ms
@@ -65,12 +66,18 @@ sensor:
       name: Werkplaats tool power
       unit_of_measurement: W
       internal: yes
-  
-  - platform: homeassistant
-    name: Werkplaats tool trigger level
-    entity_id: input_number.werkplaats_tool_trigger
+
+number:
+  - platform: template
+    name: "Werkplaats tool trigger level"
     id: trigger
-    internal: yes
+    optimistic: true
+    min_value: 10
+    max_value: 1000
+    initial_value: 100
+    restore_value: true
+    entity_category: config
+    step: 5
 
 switch:
   - platform: restart

@@ -15,7 +15,7 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Slimmemeter Fallback Hotspot"
-    password: "57ZDT3EJmzWO"
+    password: !secret fallback_password
 
 captive_portal:
 

@@ -11,7 +11,7 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "ble track Fallback Hotspot"
-    password: "57ZDT3EJmzWO"
+    password: !secret fallback_password
 
 captive_portal:
 
@@ -50,24 +50,27 @@ sensor:
     battery_level:
       name: "Woonkamer Boom Battery Level"
       
-  - platform: template
-    name: "FitBit Aria Scale"
-    id: aria_sensor
+  - platform: ble_client
+    ble_client_id: fitbit_aria
+    name: "fitbit_weight"
+    service_uuid: '181d'
+    characteristic_uuid: '67B0AB2C-8323-427A-B1C9-70324BB5E228'
+    icon: 'mdi:battery'
+    unit_of_measurement: 'kg'
+  
 
 switch:
   - platform: restart
     name: BLE Tracker Restart
 
-esp32_ble_tracker:
-  on_ble_service_data_advertise:
-    - mac_address: A4:C1:38:B0:1E:CC
-      service_uuid: 181D
-      then:
-        - lambda: |-
-            id(aria_sensor).publish_state(x[0]);
-            ESP_LOGD("ble_adv", " data: %d", x[0]);
-        
+ble_client:
+  - mac_address: A4:C1:38:B0:1E:CC
+    id: fitbit_aria
 
+esp32_ble_tracker:
+#  on_ble_service_data_advertise:
+#      service_uuid: 181D
+        
 # on_ble_advertise:
 #   - mac_address: A4:C1:38:B0:1E:CC
 #     then:
@@ -77,13 +80,17 @@ esp32_ble_tracker:
 #           ESP_LOGD("ble_adv", "  name: %s", x.get_name().c_str());
 #           ESP_LOGD("ble_adv", "  Advertised service UUIDs:");
 #           for (auto uuid : x.get_service_uuids()) {
-#               ESP_LOGD("ble_adv", "    - %s", uuid.to_string().c_str());
+#             ESP_LOGD("ble_adv", "    - %s", uuid.to_string().c_str());
 #           }
 #           ESP_LOGD("ble_adv", "  Advertised service data:");
 #           for (auto data : x.get_service_datas()) {
-#               ESP_LOGD("ble_adv", "    - %s: (length %i)", data.uuid.to_string().c_str(), data.data.size());
+#             ESP_LOGD("ble_adv", "    - %s: (length %i)", data.uuid.to_string().c_str(), data.data.size());
 #           }
 #           ESP_LOGD("ble_adv", "  Advertised manufacturer data:");
 #           for (auto data : x.get_manufacturer_datas()) {
-#               ESP_LOGD("ble_adv", "    - %s: (length %i)", data.uuid.to_string().c_str(), data.data.size());
+#             ESP_LOGD("ble_adv", "    - %s: (length %i)", data.uuid.to_string().c_str(), data.data.size());
+#             for ( int i=0; i < data.data.size(); i++){
+#               ESP_LOGD("ble_adv_data", " %d: %02x", i, data.data[i]);
+#             }
 #           }
+            

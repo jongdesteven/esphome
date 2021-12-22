@@ -11,7 +11,7 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Doorbell Fallback Hotspot"
-    password: "57ZDT3EJmzWO"
+    password: !secret fallback_password
 
 captive_portal:
 
@@ -38,18 +38,29 @@ globals:
 text_sensor:
   - platform: version
     name: Doorbell ESPHome Version
-  
-  - platform: homeassistant
+
+number:
+  - platform: template
     name: "Doorbell Ring time (ms)"
-    entity_id: input_number.doorbell_ring_time
     id: doorbell_ring_time_ms
-    internal: true
-  
-  - platform: homeassistant
-    name: "Doorbell Cooldown"
-    entity_id: input_number.doorbell_cooldown
+    optimistic: true
+    min_value: 5
+    max_value: 1000
+    initial_value: 100
+    restore_value: true
+    entity_category: config
+    step: 5
+    
+  - platform: template
+    name: "Doorbell Cooldown (s)"
     id: doorbell_cooldown_s
-    internal: true
+    optimistic: true
+    min_value: 1
+    max_value: 60
+    initial_value: 5
+    restore_value: true
+    entity_category: config
+    step: 1
 
 sensor:
   #- platform: uptime
@@ -85,6 +96,30 @@ switch:
     name: "Doorbell Bell"
     id: bell
     restore_mode: ALWAYS_OFF
+    on_turn_on: 
+      - script.execute: ring_bell
+    
+script:
+  - id: bell_cooldown
+    mode: single
+    then:
+      - switch.turn_off: bell
+      - switch.turn_off: ringer_on
+      - delay: !lambda |-
+          return id(doorbell_cooldown_s).state * 1000;
+      - switch.turn_on: ringer_on
+      
+  - id: ring_bell
+    mode: single
+    then:
+      if:
+        condition:
+          switch.is_on: ringer_on
+        then:
+          - switch.turn_on: bell
+          - delay: !lambda |-
+              return id(doorbell_ring_time_ms).state;
+          - switch.turn_off: bell
 
 binary_sensor:
   # Doorbell Button at frontdoor on D3
@@ -95,21 +130,11 @@ binary_sensor:
       inverted: true
     id: button
     filters:
-      - delayed_on_off: 25ms
+      - delayed_on_off: 10ms
     on_press:
-      if:
-        condition:
-          switch.is_on: ringer_on
-        then:
-          - switch.turn_on: bell
-          - lambda: !lambda |-
-              delay( atoi( id(doorbell_ring_time_ms).state.c_str() ));
-          - switch.turn_off: bell
+      then:
+        - script.execute: ring_bell
     on_release:
       then:
-        - switch.turn_off: bell
-        - switch.turn_off: ringer_on
-        - lambda: !lambda |-
-            delay( atoi( id(doorbell_cooldown_s).state.c_str() )*1000);
-        - switch.turn_on: ringer_on
+        - script.execute: bell_cooldown
   
