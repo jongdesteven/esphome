@@ -21,6 +21,7 @@ captive_portal:
 
 # Enable logging
 logger:
+  baud_rate: 0
 
 # Enable Home Assistant API
 api:
@@ -169,14 +170,16 @@ sensor:
     - name: "Gas device type Sensor"
     - name: "Gas valve position Sensor"  
     - name: "Gas Meter M3 Sensor"
-      unit_of_measurement: m³
+      unit_of_measurement: "m³"
       accuracy_decimals: 3
-      device_class: "energy"
+      device_class: "gas"
       state_class: "total_increasing"
     - name: "Water device type Sensor"
-    - name: "Water valve position Sensor"  
+    - name: "Water valve position Sensor"
     - name: "Water Meter M3 Sensor"
-      unit_of_measurement: m³
+      unit_of_measurement: "m³"
       accuracy_decimals: 3
+      device_class: "gas"
       state_class: "total_increasing"
+    
 

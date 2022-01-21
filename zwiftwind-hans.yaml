@@ -1,5 +1,5 @@
 esphome:
-  name: zwiftwind
+  name: zwiftwind-hans
   platform: ESP32
   board: nodemcu-32s
 
@@ -8,9 +8,7 @@ wifi:
   password: !secret wifi_password
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "ZwiftWind Fallback Hotspot"
-    password: !secret fallback_password
+  ap: {}
 
 captive_portal:
 
@@ -331,7 +329,7 @@ sensor:
   # Zwift sensors
   - platform: homeassistant
     id: zwift_heartrate
-    entity_id: !secret zwift_hr_entity
+    entity_id: sensor.zwift_heart_rate_3955289
     on_value:
       if:
         condition:
@@ -343,7 +341,7 @@ sensor:
           - script.execute: fan_adjust_hr
   - platform: homeassistant
     id: zwift_power
-    entity_id: !secret zwift_power_entity
+    entity_id: sensor.zwift_power_3955289
     on_value:
       if:
         condition:
@@ -355,7 +353,7 @@ sensor:
           - script.execute: fan_adjust_power
   - platform: homeassistant
     id: zwift_speed
-    entity_id: !secret zwift_speed_entity
+    entity_id: sensor.zwift_speed_3955289
     on_value:
       if:
         condition:
