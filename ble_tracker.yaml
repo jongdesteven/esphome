@@ -50,13 +50,13 @@ sensor:
     battery_level:
       name: "Woonkamer Boom Battery Level"
       
-  - platform: ble_client
-    ble_client_id: fitbit_aria
-    name: "fitbit_weight"
-    service_uuid: '181d'
-    characteristic_uuid: '67B0AB2C-8323-427A-B1C9-70324BB5E228'
-    icon: 'mdi:battery'
-    unit_of_measurement: 'kg'
+#  - platform: ble_client
+#    ble_client_id: fitbit_aria
+#    name: "fitbit_weight"
+#    service_uuid: '181d'
+#    characteristic_uuid: '67B0AB2C-8323-427A-B1C9-70324BB5E228'
+#    icon: 'mdi:battery'
+#    unit_of_measurement: 'kg'
   
 
 switch:

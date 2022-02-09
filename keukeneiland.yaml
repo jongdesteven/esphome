@@ -1,7 +1,7 @@
 esphome:
   name: keukeneiland
   platform: ESP8266
-  board: esp8285
+  board: esp01_1m
 
 wifi:
   ssid: !secret wifi_name
@@ -9,8 +9,8 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Keukeneiland Fallback Hotspot"
-    password: "57ZDT3EJmzWO"
+    ssid: "Keukeneiland Fallback"
+    password: !secret fallback_password
 
 captive_portal:
 
@@ -29,9 +29,6 @@ ota:
   password: !secret ota_password
 
 sensor:
-  - platform: uptime
-    name: keukeneiland uptime
-
   - platform: wifi_signal
     name: Keukeneiland WiFi Signal
     update_interval: 60s
@@ -39,13 +36,29 @@ sensor:
 switch:
   - platform: restart
     name: Keukeneiland Restart
-
+    
+#light:
+#  - platform: binary
+#    name: keuken_5
+#    output: output1
+#  - platform: binary
+#    name: keuken_13
+#    output: output2
+#
+#output:
+#  - platform: gpio
+#    pin: GPIO5
+#    id: output1
+#  - platform: gpio
+#    pin: GPIO13
+#    id: output2
+  
 light:
   - platform: cwww
     id: lamp
     name: "Keukeneiland lamp"
-    cold_white: output2
-    warm_white: output1
+    cold_white: output_cold
+    warm_white: output_warm
     cold_white_color_temperature: 7000 K
     warm_white_color_temperature: 2800 K
     constant_brightness: true
@@ -53,9 +66,7 @@ light:
 output:
   - platform: esp8266_pwm
     pin: GPIO5
-    id: output1
+    id: output_cold
   - platform: esp8266_pwm
-    pin: GPIO12
-    id: output2
-
-  
+    pin: GPIO13
+    id: output_warm

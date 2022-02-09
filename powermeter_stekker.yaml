@@ -29,8 +29,8 @@ ota:
   password: !secret ota_password
 
 # Enable Web server
-web_server:
-  port: 80
+#web_server:
+#  port: 80
 
 sensor:
   - platform: wifi_signal
@@ -95,7 +95,15 @@ sensor:
         # Make everything below 2W appear as just 0W.
         # Furthermore it corrects 1.14W for the power usage of the plug.
         - lambda: if (x < (2 + 1.14)) return 0; else return (x - 1.14);
-  
+    energy:
+      name: Broodoven Energy Consumption
+      unit_of_measurement: kWh
+      accuracy_decimals: 3
+      filters:
+        - multiply: 0.001
+      device_class: "energy"
+      state_class: "total_increasing"
+      
 switch:
   - platform: restart
     name: Broodoven Restart

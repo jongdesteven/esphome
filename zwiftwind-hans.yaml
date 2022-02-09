@@ -309,10 +309,6 @@ script:
       - script.execute: speed_stepping
       
 sensor:
-  - platform: uptime
-    entity_category: diagnostic
-    name: ZwiftWind uptime
-
   - platform: wifi_signal
     name: ZwiftWind WiFi Signal
     entity_category: diagnostic

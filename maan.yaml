@@ -35,9 +35,6 @@ globals:
      initial_value: '1.0'
 
 sensor:
-  - platform: uptime
-    name: Maan uptime
-
   - platform: wifi_signal
     name: Maan WiFi Signal
     update_interval: 60s

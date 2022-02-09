@@ -29,9 +29,6 @@ ota:
   password: !secret ota_password
 
 sensor:
-  - platform: uptime
-    name: "stopcontact_voorkant uptime"
-
   - platform: wifi_signal
     entity_category: diagnostic
     disabled_by_default: false

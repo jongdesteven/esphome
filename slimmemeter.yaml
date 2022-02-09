@@ -48,9 +48,6 @@ switch:
     name: Slimmemeter Restart
     
 sensor:
-  - platform: uptime
-    name: Slimmemeter uptime
-
   - platform: wifi_signal
     name: Slimmemeter WiFi Signal
     update_interval: 60s

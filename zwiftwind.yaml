@@ -311,10 +311,6 @@ script:
       - script.execute: speed_stepping
       
 sensor:
-  - platform: uptime
-    entity_category: diagnostic
-    name: ZwiftWind uptime
-
   - platform: wifi_signal
     name: ZwiftWind WiFi Signal
     entity_category: diagnostic
@@ -337,6 +333,8 @@ sensor:
         condition:
           and:
             - fan.is_on: the_fan
+            - lambda: |-
+                return x > 0; //valid HeartRate
             - lambda: |-
                 return id(mode).state == "HR";
         then:

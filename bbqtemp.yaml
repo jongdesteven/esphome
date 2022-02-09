@@ -33,9 +33,6 @@ spi:
   clk_pin: D1
     
 sensor:
-  - platform: uptime
-    name: BBQtemp uptime
-
   - platform: wifi_signal
     name: BBQtemp WiFi Signal
     update_interval: 60s

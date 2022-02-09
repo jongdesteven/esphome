@@ -9,8 +9,8 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Kartentlamp Fallback Hotspot"
-    password: "57ZDT3EJmzWO"
+    ssid: "Kartentlamp Fallback"
+    password: !secret fallback_password
 
 captive_portal:
 
@@ -29,9 +29,6 @@ ota:
   password: !secret ota_password
 
 sensor:
-  - platform: uptime
-    name: kartentlamp uptime
-
   - platform: wifi_signal
     name: Kartentlamp WiFi Signal
     update_interval: 60s
@@ -41,14 +38,19 @@ switch:
     name: Kartentlamp Restart
 
 light:
-  - platform: rgbq
+  - platform: rgbw
     id: lamp
     name: "Kartent lamp"
     red: output2
     green: output1
     blue: output3
     white: output4
-    constant_brightness: true
+    color_interlock: false
+    effects:
+     - pulse
+     - random
+     - flicker
+     - strobe
 
 output:
   - platform: esp8266_pwm
